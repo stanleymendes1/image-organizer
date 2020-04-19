@@ -32,16 +32,25 @@ class OrganizeCommand extends Command
         $this
             ->setDescription('Organize your images by month and year')
             ->setProcessTitle('image-organizer')
-            ->addArgument('directory', InputArgument::REQUIRED, 'Directory where to find images');
+            ->addArgument('directory', InputArgument::REQUIRED, 'Directory where to find images')
+            ->addOption('file-name', null, InputArgument::OPTIONAL, 'Change the file name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $directory = $input->getArgument('directory');
+        $fileName = $input->getOption('file-name');
         $images = $this->imageFinder->find($directory);
 
         foreach ($images as $image) {
-            $this->imageMover->move($image, $directory);
+            $this->imageMover->move($image, $directory, $fileName);
+
+            if($output->isVerbose())
+            {
+                $output->writeln('Image: ' . $image->getFilename() . ' moved with success!');
+            }
         }
+
+        return 0;
     }
 }
